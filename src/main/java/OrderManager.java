@@ -1,27 +1,32 @@
 import model.Ingredient;
 import model.MenuItem;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static model.Ingredient.*;
+import static model.MenuItem.*;
 
 public class OrderManager {
 
     private static final Map<MenuItem, List<Ingredient>> MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS = new HashMap<>();
 
     static {
-        List<Ingredient> milkSugarAndWater = Collections.unmodifiableList(Arrays.asList(Ingredient.MILK, Ingredient.SUGAR, Ingredient.WATER));
-        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(MenuItem.CHAI, milkSugarAndWater);
-        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(MenuItem.COFFEE, milkSugarAndWater);
-        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(MenuItem.BANANASMOOTHIE, milkSugarAndWater);
-        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(MenuItem.STRAWBERRYSHAKE, milkSugarAndWater);
-        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(MenuItem.MOHITO, Arrays.asList(Ingredient.SUGAR, Ingredient.WATER, Ingredient.SODA, Ingredient.MINT));
+        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(CHAI, Arrays.asList(TEA, MILK, SUGAR, WATER));
+        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(MenuItem.COFFEE, Arrays.asList(Ingredient.COFFEE, MILK, SUGAR, WATER));
+        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(BANANASMOOTHIE, Arrays.asList(BANANA, MILK, SUGAR, WATER));
+        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(STRAWBERRYSHAKE, Arrays.asList(STRAWBERRY, MILK, SUGAR, WATER));
+        MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(MOHITO, Arrays.asList(SUGAR, WATER, SODA, MINT));
     }
 
     public float getFinalPrice(String order) {
         throwExceptionIfValueIsNull(order);
         throwExceptionIfOrderStringIsEmpty(order);
         String[] menuItemAndExclusions = getWithoutWhiteSpaces(order).split(",-");
-        MenuItem menuItem = getMenuItem(menuItemAndExclusions[0]);
+        MenuItem menuItem = getMenuItem(menuItemAndExclusions);
         List<Ingredient> excludedIngredients = getExcludedIngredients(menuItemAndExclusions);
         throwExceptionIfAllTheIngredientsWereExcluded(menuItem, excludedIngredients);
         return calculatePrice(menuItem, excludedIngredients);
@@ -43,18 +48,18 @@ public class OrderManager {
         return string.replace(" ", "");
     }
 
-    private MenuItem getMenuItem(String menuItemAndExclusion) {
+    private MenuItem getMenuItem(String[] menuItemAndExclusions) {
         try {
-            return MenuItem.valueOf(menuItemAndExclusion.toUpperCase());
+            return MenuItem.valueOf(menuItemAndExclusions[0].toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("No expected menu item found in the order !");
         }
     }
 
-    private List<Ingredient> getExcludedIngredients(String[] menuItemWithExclusions) {
+    private List<Ingredient> getExcludedIngredients(String[] menuItemAndExclusions) {
         try {
-            return Arrays.stream(menuItemWithExclusions)
-                    .skip(1)        // skips menu item
+            String[] excludedIngredientNames = Arrays.copyOfRange(menuItemAndExclusions, 1, menuItemAndExclusions.length);
+            return Arrays.stream(excludedIngredientNames)
                     .map(String::toUpperCase)
                     .map(Ingredient::valueOf)
                     .collect(Collectors.toList());

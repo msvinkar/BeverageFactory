@@ -66,14 +66,14 @@ public class AcceptanceTests {
     }
 
     @Test
-    public void showBeveragePriceWhenOrderDoesNotHaveAnyExclusions() {
+    public void showMenuItemPriceWhenOrderDoesNotHaveAnyExclusions() {
         String order = "Banana Smoothie";
         float actualPrice = orderManager.getFinalPrice(order);
         assertEquals(MenuItem.BANANASMOOTHIE.getPrice(), actualPrice, 0);
     }
 
     @Test
-    public void showSubtractedAmountFromOriginalBeveragePriceWhenOrderHasExclusions() {
+    public void showSubtractedAmountFromOriginalMenuItemPriceWhenOrderHasExclusions() {
         String order = "Strawberry Shake, -sugar, -Water";
         float expectedPrice = MenuItem.STRAWBERRYSHAKE.getPrice() - Ingredient.SUGAR.getPrice() - Ingredient.WATER.getPrice();
         float actualPrice = orderManager.getFinalPrice(order);
