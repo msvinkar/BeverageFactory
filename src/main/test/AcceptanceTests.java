@@ -80,4 +80,23 @@ public class AcceptanceTests {
         assertEquals(expectedPrice, actualPrice, 0);
     }
 
+    @Test
+    public void showMenuItemPricesWhenMultipleValidOrdersArePlacedAtOnce() {
+        String[] orders = new String[]{"Strawberry Shake, -sugar, -Water", "Banana Smoothie"};
+        float expectedPriceForStrawberryShake = MenuItem.STRAWBERRYSHAKE.getPrice() - Ingredient.SUGAR.getPrice() - Ingredient.WATER.getPrice();
+        double expectedPrice = expectedPriceForStrawberryShake + MenuItem.BANANASMOOTHIE.getPrice();
+        double actualPrice = orderManager.getTotalPrice(orders);
+        assertEquals(expectedPrice, actualPrice, 0);
+    }
+
+    @Test
+    public void showMenuItemPricesWhenMultipleOrdersArePlacedAtOnceButSomeOfThemAreInvalid() {
+        String invalidOrder = "Chai, -Tea, -Milk, -Sugar, -Water";
+        String[] order = new String[]{"Strawberry Shake, -sugar, -Water", "Banana Smoothie", invalidOrder};
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("One of the orders was invalid. ");
+        expectedException.expectMessage("Order can not be accepted as all of ingredients are excluded !");
+        orderManager.getTotalPrice(order);
+    }
+
 }

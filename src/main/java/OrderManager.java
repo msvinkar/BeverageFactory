@@ -22,7 +22,17 @@ public class OrderManager {
         MENU_ITEM_VS_EXCLUDABLE_INGREDIENTS.put(MOHITO, Arrays.asList(LEMON, SUGAR, WATER, SODA, MINT));
     }
 
-    public float getFinalPrice(String order) {
+    public double getTotalPrice(String[] orders) {
+        try {
+            return Arrays.stream(orders)
+                    .mapToDouble(this::getFinalPrice)
+                    .sum();
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new IllegalStateException("One of the orders was invalid. " + e.getMessage());
+        }
+    }
+
+    public Float getFinalPrice(String order) {
         throwExceptionIfValueIsNull(order);
         throwExceptionIfOrderStringIsEmpty(order);
         String[] menuItemAndExclusions = getWithoutWhiteSpaces(order).split(",-");
