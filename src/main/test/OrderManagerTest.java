@@ -6,7 +6,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 
-public class AcceptanceTests {
+public class OrderManagerTest {
 
     private OrderManager orderManager = new OrderManager();
 
@@ -14,14 +14,14 @@ public class AcceptanceTests {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void orderMustHaveAtLeastOneMenuItem_failsIfOrderIsNull() {
+    public void shouldThrowExceptionIfOrderIsNull() {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Null value found !");
         orderManager.getFinalPrice(null);
     }
 
     @Test
-    public void orderMustHaveAtLeastOneMenuItem_failsIfOrderIsEmpty() {
+    public void shouldThrowExceptionIfOrderIsEmpty() {
         String order = "";
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Can not accept empty order !");
@@ -29,7 +29,7 @@ public class AcceptanceTests {
     }
 
     @Test
-    public void orderMustHaveAtLeastOneMenuItem_failsIfOrderHasNoItemPresent() {
+    public void shouldThrowExceptionIfOrderHasNoItemPresent() {
         String order = "randomString";
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("No expected menu item found in the order !");
@@ -37,19 +37,19 @@ public class AcceptanceTests {
     }
 
     @Test
-    public void orderMustHaveAtLeastOneMenuItem_passesIfAtLeastOneItemIsPresentInTheOrder() {
+    public void allowOrderWhichHasLeastOneItemIsPresentInTheOrder() {
         String order = "CHAI";
         orderManager.getFinalPrice(order);
     }
 
     @Test
-    public void orderCanExistWithoutExclusion() {
+    public void allowOrderWithoutExclusion() {
         String order = "COFFEE";
         orderManager.getFinalPrice(order);
     }
 
     @Test
-    public void orderCannotHaveAllTheIngredientsExcludedForAMenuItem_showsInvalidOrderMessage() {
+    public void throwExceptionIfOrderHasAllTheIngredientsExcludedForAMenuItem() {
         String order = "Chai, -Tea, -Milk, -Sugar, -Water";
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Order can not be accepted as all of ingredients are excluded !");
@@ -57,7 +57,7 @@ public class AcceptanceTests {
     }
 
     @Test
-    public void whenOrderHasInvalidIngredientsInExclusions_showErrorMessage() {
+    public void throwExceptionWhenOrderHasInvalidIngredientsInExclusions() {
         String order = "Chai, -Tea, -InvalidIngredient";
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Invalid ingredients found !");
